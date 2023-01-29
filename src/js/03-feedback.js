@@ -1,46 +1,34 @@
-// console.log(localStorage);
-
 import throttle from 'lodash.throttle';
 
+const form = document.querySelector('.feedback-form');
 const STORAGE_KEY = 'feedback-form-state';
-let formData = {};
-const savedValues = localStorage.getItem(STORAGE_KEY);
-const savedDataObject = JSON.parse(savedValues);
+let getData = localStorage.getItem(STORAGE_KEY);
 
-const refs = {
-  form: document.querySelector('.feedback-form'),
-  input: document.querySelector('.feedback-form  input'),
-  textarea: document.querySelector('.feedback-form  textarea'),
-};
-
-refs.form.addEventListener('submit', onFormSubmit);
-refs.form.addEventListener('input', throttle(storageFormData, 500));
-
+const formData = {};
 reloadPage();
 
-function onFormSubmit(evt) {
-  evt.preventDefault();
-  //   console.log(evt);
-  const savedDatas = JSON.parse(localStorage.getItem(STORAGE_KEY));
-  console.log(savedDatas);
-  //   console.log('Отправляем форму');
-  evt.currentTarget.reset();
-  localStorage.removeItem(STORAGE_KEY);
-  formData = {};
-}
+form.addEventListener('submit', onFormSubmit);
+form.addEventListener('input', throttle(storageFormData, 500));
 
-function storageFormData(evt) {
-  //const message = evt.target.value;
-  //   console.log(message);
-  // localStorage.setItem(STORAGE_KEY, message);
-
-  formData[evt.target.name] = evt.target.value.trim();
+function storageFormData(e) {
+  formData[e.target.name] = e.target.value;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
 }
 
 function reloadPage() {
-  if (savedValues) {
-    refs.input.value = savedDataObject.email || '';
-    refs.textarea.value = savedDataObject.message || '';
+  if (getData) {
+    getData = JSON.parse(getData);
+    Object.entries(getData).forEach(([name, value]) => {
+      formData[name] = value;
+      form.elements[name].value = value;
+    });
   }
+}
+
+function onFormSubmit(e) {
+  e.preventDefault();
+  const outputData = new FormData(form);
+  outputData.forEach((value, name) => console.log(`${name}:`, value));
+  e.target.reset();
+  localStorage.removeItem(STORAGE_KEY);
 }
