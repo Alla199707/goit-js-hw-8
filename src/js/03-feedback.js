@@ -20,7 +20,9 @@ function reloadPage() {
     getData = JSON.parse(getData);
     Object.entries(getData).forEach(([name, value]) => {
       formData[name] = value;
+      console.log(formData[name]);
       form.elements[name].value = value;
+      console.log(form.elements[name].value);
     });
   }
 }
